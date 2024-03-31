@@ -1,57 +1,102 @@
-from checking import Checking
-from diseases import Diseases
-from suggestion import Suggestion
+from tkinter import ttk
+import tkinter as tk
+from tkinter import *
+from tkinter import messagebox
+import stroke as strk
+import diabetes as dbts
 
-# Inisialisasi AI Medis
-medical_ai = Checking()
-diseases_ai = Diseases()
-suggestion_ai = Suggestion()
+def comandan():
+    validation()
+    scanning()
 
-bold_start = '\033[1m'
-bold_end = '\033[0m'
+def validation():
+    height = entry_height.get()
+    weight = entry_weight.get()
+    blood_pressure = entry_blood_pressure.get()
+    cholesterol = entry_cholesterol.get()
+    blood_sugar = entry_blood_sugar.get()
 
-# Input data pasien (untuk tes, dapat dimasukkan angka apa saja)
-print("Silakan isi form dibawah untuk melakukan Medical Checkup")
-print(bold_start +"(pastikan anda sedang dalam  keadaan berpuasa)" + bold_end)
-age = int(input("Umur: "))
-height = float(input("Tinggi badan (cm): "))
-weight = float(input("Berat badan (kg): "))
-blood_pressure = int(input("Tekanan darah (mmHg): "))
-blood_sugar = int(input("Kadar gula darah: "))
-cholesterol = int(input("Kadar kolestrol: "))
+    if len(height)==0 or len(weight)==0 or len(blood_pressure)==0 or len(cholesterol)==0 or len(blood_sugar)==0:
+        messagebox.showerror('error', 'data tidak boleh kosong')
+    else:
+        try:
+            if int(height) < 0 or int(weight) < 0 or int(blood_pressure) < 0 or int(cholesterol) < 0 or int(blood_sugar) < 0:
+                messagebox.showerror('error', 'data yang diinput tidak boleh negatif')
+                
+        except:
+            messagebox.showerror('error', 'data yang diinput kan harus berupa bilangan bulat')
 
-# Melakukan pemeriksaan medis menggunakan AI
-result = medical_ai.medical_checkup(age, height, weight, blood_pressure, blood_sugar, cholesterol)
-health_index = result[0]
-weight_status = result[1]
-blood_pressure_status = result[2]
-blood_sugar_status = result[3]
-cholesterol_status = result[4]
 
-# Output hasil pemeriksaan medis
-if not health_index:
-    print(bold_start + "Anda dalam kondisi ideal!" + bold_end)
-else:
-    print("===============")
-    print(bold_start + "Anda mengalami:" + bold_end)
-    for i in health_index:
-        print(f"- {i}")
-    print( )
-    
-    print(bold_start + "Risiko penyakit yang mungkin bisa anda alami:" + bold_end)
-    diseases_list = diseases_ai.possible_diseases(weight_status, blood_pressure_status, blood_sugar_status, cholesterol_status)
-    found = set()
-    for i in diseases_list:
-        if i in found:
-            continue
-        print(f"- {i}")
-        found.add(i)
-    print( )
-    
-    print(bold_start + "Saran yang bisa saya berikan:" + bold_end)
-    suggestion_list = suggestion_ai.suggestion(weight_status, blood_pressure_status, blood_sugar_status, cholesterol_status)
-    for i in suggestion_list:
-        print(f"* {i}")
-    print(bold_start + "Jangan lupa menjaga pola makan dan rutin berolahraga" + bold_end)
-    print(bold_start + "Analisis di atas mungkin  masih ada kesalahan \n Saya menganjurkan berkonsultasi dengan dokter untuk evaluasi lebih lanjut." + bold_end)
-    
+def scanning():
+    height = int(entry_height.get())
+    weight = int(entry_weight.get())
+    blood_pressure = int(entry_blood_pressure.get())
+    cholesterol = int(entry_cholesterol.get())
+    blood_sugar = int(entry_blood_sugar.get())
+
+    height = height/100
+    idx_bmi = weight / height**2
+
+    if idx_bmi <= 30.0 :
+        
+
+        result_stroke = strk.stroke_checking(blood_pressure, cholesterol, blood_sugar)
+        print(f"Stroke Chance: {result_stroke}")
+
+        result_diabetes = dbts.diabetes_checking(idx_bmi, cholesterol, blood_sugar)
+        print(f"Diabetes Chance: {result_diabetes}")
+        
+        
+    else:
+        messagebox.showerror('error', "tinggi atau berat badan anda tidak valid")
+
+
+
+window = Tk()
+window.title("Medical Checkup")
+
+frame = Frame(window, padx=10, pady=10)
+
+label_judul = Label(frame, text="Medical Checkup", font=('verdana',15))
+
+label_height = Label(frame, text="Tinggi badan(cm): ", font=('verdana',12))
+entry_height = Entry(frame, font=('verdana',12))
+
+label_weight = Label(frame, text="Berat badan(kg): ", font=('verdana',12))
+entry_weight = Entry(frame, font=('verdana',12))
+
+label_blood_pressure = Label(frame, text="Tekanan darah(mHg): ", font=('verdana',12))
+entry_blood_pressure = Entry(frame, font=('verdana',12))
+
+label_cholesterol = Label(frame, text="Kolestrol(mg): ", font=('verdana',12))
+entry_cholesterol = Entry(frame, font=('verdana',12))
+
+label_blood_sugar = Label(frame, text="Gula darah(mg): ", font=('verdana',12))
+entry_blood_sugar = Entry(frame, font=('verdana',12))
+
+
+button_insert = Button(frame, text="Insert", font=('verdana',14), bg='light green', command=comandan)
+
+
+label_judul.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
+
+label_height.grid(row=1, column=0, sticky='e')
+entry_height.grid(row=1, column=1, pady=10, padx=10)
+
+label_weight.grid(row=2, column=0, sticky='e')
+entry_weight.grid(row=2, column=1, pady=10, padx=10)
+
+label_blood_pressure.grid(row=3, column=0, sticky='e')
+entry_blood_pressure.grid(row=3, column=1, pady=10, padx=10)
+
+label_cholesterol.grid(row=4, column=0, sticky='e')
+entry_cholesterol.grid(row=4, column=1, pady=10, padx=10)
+
+label_blood_sugar.grid(row=5, column=0, sticky='e')
+entry_blood_sugar.grid(row=5, column=1, pady=10, padx=10)
+
+button_insert.grid(row=6,column=0, columnspan=2, pady=10, padx=10)
+
+frame.grid(row=0, column=0)
+
+window.mainloop()
